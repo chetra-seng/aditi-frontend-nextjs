@@ -105,48 +105,6 @@ News media
 
 </div>
 
----
-
-# Next.js by the Numbers
-
-<div class="grid grid-cols-3 gap-8 text-center">
-
-<div>
-
-## 120K+
-GitHub Stars
-
-</div>
-
-<div>
-
-## 6M+
-Weekly npm downloads
-
-</div>
-
-<div>
-
-## 500K+
-Websites in production
-
-</div>
-
-</div>
-
-<v-clicks>
-
-**Why developers choose Next.js:**
-- Backed by Vercel (well-funded, active development)
-- React team collaboration (React features land here first)
-- Massive ecosystem and community
-- Excellent documentation
-- Production-proven at scale
-
-</v-clicks>
-
----
-
 # What is Next.js?
 
 <v-clicks>
@@ -273,6 +231,8 @@ my-next-app/
 └── tailwind.config.ts     # Tailwind config
 ```
 
+---
+src: ./01b-tailwind-intro.md
 ---
 
 # App Router vs Pages Router

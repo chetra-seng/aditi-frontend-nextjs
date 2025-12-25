@@ -56,9 +56,9 @@ From React to Production-Ready Applications
 layout: center
 ---
 
-# Part 1: React Foundation
+# Part 1: React Limitations
 
-Understanding what we're building from 🤔
+Understanding what React lacks 🤔
 
 ---
 src: ./contents/01-react-problems.md

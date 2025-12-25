@@ -1,10 +1,5 @@
-# Part 1: React Foundation
-
-Understanding what we're building from
-
 ---
 layout: two-cols
-layoutClass: gap-8
 ---
 
 # Investigate This App 🔍
