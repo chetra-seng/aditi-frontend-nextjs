@@ -12,21 +12,21 @@ download: true
 info: |
   ## Mastering Next.js - Complete Course
 
-  A comprehensive Next.js tutorial covering everything from React limitations to building production-ready applications. Learn App Router, Server Components, Data Fetching, SSR, SSG, ISR, API Routes, and deployment strategies.
+  A comprehensive Next.js tutorial covering everything from React limitations to building full-stack applications. Learn App Router, Server Components, Data Fetching, and essential libraries like React Query, Zod, React Hook Form, and shadcn/ui.
 
   Perfect for React developers looking to level up with the most popular React framework.
 
-keywords: Next.js, React, Next.js Tutorial, Learn Next.js, App Router, Server Components, SSR, SSG, ISR, API Routes, Full Stack, Web Development, Vercel, React Framework
+keywords: Next.js, React, Next.js Tutorial, Learn Next.js, App Router, Server Components, SSR, SSG, ISR, API Routes, Full Stack, Web Development, React Query, Zod, React Hook Form, shadcn/ui
 author: Aditi Fullstack Course
-description: Master Next.js from basics to production. Learn App Router, Server Components, Data Fetching, Rendering Strategies, and build real full-stack applications.
+description: Master Next.js from basics to full-stack apps. Learn App Router, Server Components, Data Fetching, plus React Query, Zod, React Hook Form, and shadcn/ui.
 
 # Open Graph / Social Media
 seoMeta:
   ogType: website
   ogTitle: Mastering Next.js - Complete Course for React Developers
-  ogDescription: Master Next.js from React limitations to production-ready apps. Learn App Router, Server Components, SSR, SSG, ISR, and deployment.
+  ogDescription: Master Next.js from React limitations to full-stack apps. Learn App Router, Server Components, React Query, Zod, React Hook Form, and shadcn/ui.
   ogImage: https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=630&fit=crop
-  ogUrl: https://aditi-nextjs.chetraseng.com
+  ogUrl: https://aditi-frontend.nextjs.chetraseng.com
 
 # HTML attributes
 htmlAttrs:
@@ -46,11 +46,11 @@ From React to Production-Ready Applications
 - Set up a Next.js project from scratch
 - Master the App Router and file-based routing
 - Learn Server Components vs Client Components
-- Deep dive into data fetching patterns
-- Explore rendering strategies (SSR, SSG, ISR, CSR)
+- Deep dive into data fetching with React Query
+- Build forms with React Hook Form + Zod
+- Use shadcn/ui for beautiful components
 - Build API Routes and Server Actions
-- Optimize performance like a pro
-- Deploy to production with confidence
+- Explore rendering strategies (SSR, SSG, ISR, CSR)
 
 ---
 layout: center
@@ -110,6 +110,18 @@ Multiple strategies for different needs 🔄
 
 ---
 src: ./contents/04-data-fetching.md
+---
+
+---
+layout: center
+---
+
+# Practice Time!
+
+Add Data Fetching to TaskFlow
+
+---
+src: ./contents/04a-apply-data-fetching.md
 ---
 
 ---

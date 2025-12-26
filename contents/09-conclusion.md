@@ -74,13 +74,14 @@
 </v-clicks>
 
 ---
+layout: center
+---
 
-# Thank You!
+<div class='text-center'>
 
-Questions?
+# Thank You!!!
+</div>
 
 <div class="mt-8">
-  <a href="https://nextjs.org" target="_blank" class="text-blue-500 hover:underline">
-    nextjs.org
-  </a>
+  <img src="https://i.ytimg.com/vi/7__us6V_oNc/maxresdefault.jpg" class="mx-auto w-[600px] rounded" />
 </div>

@@ -220,22 +220,9 @@ export default async function ProductsPage() {
 import { db } from '@/lib/database';
 
 export default async function UsersPage() {
-  // ✅ Direct database access in Server Component!
-  const users = await db.user.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 10,
-  });
+  const users = await db.user.findMany({ take: 10 });
 
-  return (
-    <div>
-      <h1>Recent Users</h1>
-      {users.map(user => (
-        <div key={user.id}>
-          {user.name} - {user.email}
-        </div>
-      ))}
-    </div>
-  );
+  return <UserList users={users} />;
 }
 ```
 
@@ -368,6 +355,33 @@ export default function Page() {
 
 ---
 
+# Revalidating Data
+
+```tsx
+// app/actions.ts
+'use server';
+
+import { revalidatePath, revalidateTag } from 'next/cache';
+
+export async function createPost(data: FormData) {
+  // Create post in database
+  await db.post.create({
+    data: {
+      title: data.get('title'),
+      content: data.get('content'),
+    },
+  });
+
+  // Revalidate the posts page
+  revalidatePath('/posts');
+
+  // Or revalidate by tag
+  revalidateTag('posts');
+}
+```
+
+---
+
 # Client-Side Data Fetching
 
 ```tsx
@@ -377,30 +391,18 @@ import { useState, useEffect } from 'react';
 
 export default function ClientProducts() {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/products')
       .then(res => res.json())
-      .then(data => {
-        setProducts(data);
-        setLoading(false);
-      });
+      .then(setProducts);
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-
-  return (
-    <div>
-      {products.map(product => (
-        <div key={product.id}>{product.name}</div>
-      ))}
-    </div>
-  );
+  return <ProductList products={products} />;
 }
 ```
 
-Use when you need interactivity or client-side updates.
+Use when you need interactivity or real-time updates.
 
 ---
 
@@ -469,27 +471,240 @@ export default function Posts() {
 
 ---
 
-# Revalidating Data
+# Why React Query?
+
+<div class="grid grid-cols-2 gap-4">
+
+<div>
+
+## Without React Query
+
+- Manual loading/error states
+- No caching strategy
+- Duplicate requests
+- Stale data problems
+- Complex refetch logic
+
+</div>
+
+<div>
+
+## With React Query
+
+- Automatic state management
+- Smart caching out of the box
+- Request deduplication
+- Background refetching
+- Declarative and simple
+
+</div>
+
+</div>
+
+---
+
+# React Query Setup: Provider
 
 ```tsx
-// app/actions.ts
-'use server';
+// app/providers.tsx
+'use client';
 
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState } from 'react';
 
-export async function createPost(data: FormData) {
-  // Create post in database
-  await db.post.create({
-    data: {
-      title: data.get('title'),
-      content: data.get('content'),
+export default function Providers({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  );
+}
+```
+
+<v-clicks>
+
+- Must be a Client Component (`'use client'`)
+- Create QueryClient inside `useState` to avoid sharing between requests
+- Wrap your app with `QueryClientProvider`
+
+</v-clicks>
+
+---
+
+# React Query Setup: Layout
+
+```tsx
+// app/layout.tsx
+import Providers from './providers';
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  );
+}
+```
+
+Now all components can use `useQuery` and `useMutation`!
+
+---
+
+# Query Keys
+
+```tsx
+// Simple key
+useQuery({ queryKey: ['todos'], queryFn: fetchTodos });
+
+// Key with variables - React Query auto-refetches when key changes!
+useQuery({
+  queryKey: ['todo', todoId],
+  queryFn: () => fetchTodo(todoId)
+});
+
+// Complex keys for filtering/pagination
+useQuery({
+  queryKey: ['todos', { status: 'done', page: 1 }],
+  queryFn: () => fetchTodos({ status: 'done', page: 1 })
+});
+```
+
+<v-clicks>
+
+- Keys are compared **by value** - no need to memoize or keep stable references
+- Keys are **hierarchical** - invalidating `['todos']` invalidates all todo queries
+- Include **all variables** your query depends on
+
+</v-clicks>
+
+---
+
+# useMutation: Creating Data
+
+```tsx
+'use client';
+
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+export default function CreatePost() {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: (newPost: { title: string }) => {
+      return fetch('/api/posts', {
+        method: 'POST',
+        body: JSON.stringify(newPost),
+      }).then(res => res.json());
+    },
+    onSuccess: () => {
+      // Invalidate and refetch posts
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
   });
 
-  // Revalidate the posts page
-  revalidatePath('/posts');
-
-  // Or revalidate by tag
-  revalidateTag('posts');
+  return (
+    <button onClick={() => mutation.mutate({ title: 'New Post' })}>
+      {mutation.isPending ? 'Creating...' : 'Create Post'}
+    </button>
+  );
 }
 ```
+
+---
+
+# Mutation States
+
+```tsx
+const mutation = useMutation({ mutationFn: createPost });
+
+// Available states
+mutation.isPending   // Request in progress
+mutation.isSuccess   // Completed successfully
+mutation.isError     // Failed
+mutation.error       // Error object if failed
+mutation.data        // Response data if successful
+
+// Trigger the mutation
+mutation.mutate(data);
+
+// Or with async/await
+const result = await mutation.mutateAsync(data);
+```
+
+---
+
+# Invalidation Strategies
+
+```tsx
+const queryClient = useQueryClient();
+
+// Invalidate a single query
+queryClient.invalidateQueries({ queryKey: ['posts'] });
+
+// Invalidate all queries starting with 'posts'
+queryClient.invalidateQueries({ queryKey: ['posts'], exact: false });
+
+// Invalidate specific post
+queryClient.invalidateQueries({ queryKey: ['posts', postId] });
+
+// Invalidate multiple queries
+queryClient.invalidateQueries({
+  predicate: (query) => query.queryKey[0] === 'posts'
+});
+
+// Remove from cache entirely
+queryClient.removeQueries({ queryKey: ['posts', postId] });
+```
+
+---
+
+# Caching Configuration
+
+```tsx
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,  // 5 minutes until data is "stale"
+      gcTime: 1000 * 60 * 30,    // 30 minutes in cache after unmount
+    },
+  },
+});
+
+// Or per-query
+useQuery({
+  queryKey: ['posts'],
+  queryFn: fetchPosts,
+  staleTime: 1000 * 60,     // This specific query stays fresh for 1 min
+  refetchOnWindowFocus: false,  // Don't refetch when tab gains focus
+});
+```
+
+<v-clicks>
+
+- **staleTime**: How long until data is considered stale (default: 0)
+- **gcTime**: How long inactive data stays in cache (default: 5 min)
+- Stale queries refetch automatically on mount/focus/reconnect
+
+</v-clicks>
+
+---
+
+# React Query vs SWR
+
+| Feature | React Query | SWR |
+|---------|-------------|-----|
+| Mutations | Built-in `useMutation` | Manual handling |
+| Devtools | Yes | Yes |
+| Cache invalidation | Powerful API | Basic |
+| Pagination | Built-in | Plugin |
+| Infinite queries | Built-in | Built-in |
+| Bundle size | ~13kb | ~4kb |
+| Learning curve | Moderate | Easy |
+
+**Choose SWR** for simple fetching needs
+
+**Choose React Query** for complex data management
