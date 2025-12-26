@@ -289,9 +289,10 @@ import type { Metadata } from 'next';
 export async function generateMetadata({
   params
 }: {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }): Promise<Metadata> {
-  const post = await fetchPost(params.slug);
+  const { slug } = await params;
+  const post = await fetchPost(slug);
 
   return {
     title: post.title,
@@ -324,10 +325,11 @@ export async function generateMetadata({
 export async function generateMetadata({
   params
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }): Promise<Metadata> {
+  const { id } = await params;
   const product = await db.product.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
 
   return {
@@ -529,28 +531,33 @@ module.exports = withBundleAnalyzer({
 ```
 
 ```bash
-# Analyze your bundle
-ANALYZE=true npm run build
+# Analyze your bundle (with webpack)
+ANALYZE=true npm run build --webpack
+
+# Turbopack is now default in Next.js 16
+# Use experimental Turbopack analyzer in next.config.js
 ```
 
 Opens interactive treemap showing bundle composition!
+
+**Note:** Turbopack is now the default bundler in Next.js 16 (2-5x faster builds).
 
 ---
 
 # Caching Strategies
 
 ```tsx
-// Cached indefinitely (until redeployed)
-const data = await fetch('https://api.example.com/static');
+// No caching by default (Next.js 16+)
+const data = await fetch('https://api.example.com/data');
 
-// Revalidate every hour
+// Revalidate every hour (time-based caching)
 const data = await fetch('https://api.example.com/data', {
   next: { revalidate: 3600 }
 });
 
-// Never cache
-const data = await fetch('https://api.example.com/dynamic', {
-  cache: 'no-store'
+// Force caching (explicit opt-in)
+const data = await fetch('https://api.example.com/static', {
+  cache: 'force-cache'
 });
 
 // Revalidate on-demand with tags
@@ -558,9 +565,10 @@ const data = await fetch('https://api.example.com/products', {
   next: { tags: ['products'] }
 });
 
-// Later, revalidate all 'products' requests
-import { revalidateTag } from 'next/cache';
-revalidateTag('products');
+// Revalidate or update cache
+import { revalidateTag, updateTag } from 'next/cache';
+revalidateTag('products');  // Background refresh
+updateTag('products');      // Immediate refresh (Next.js 16+)
 ```
 
 ---

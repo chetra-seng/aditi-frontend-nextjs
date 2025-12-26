@@ -56,7 +56,7 @@ From React to Production-Ready Applications
 layout: center
 ---
 
-# Part 1: React Limitations
+# React Limitations
 
 Understanding what React lacks 🤔
 
@@ -68,7 +68,7 @@ src: ./contents/01-react-problems.md
 layout: center
 ---
 
-# Part 2: Next.js Fundamentals
+# Next.js Fundamentals
 
 Getting started with the React framework for production ✨
 
@@ -80,7 +80,7 @@ src: ./contents/02-nextjs-intro.md
 layout: center
 ---
 
-# Part 3: Routing & Navigation
+# Routing & Navigation
 
 File-based routing made simple 📁
 
@@ -92,7 +92,19 @@ src: ./contents/03-routing.md
 layout: center
 ---
 
-# Part 4: Data Fetching
+# Practice Time!
+
+Build A Task Manager App
+
+---
+src: ./contents/03a-apply-routing.md
+---
+
+---
+layout: center
+---
+
+# Data Fetching
 
 Multiple strategies for different needs 🔄
 
@@ -104,7 +116,7 @@ src: ./contents/04-data-fetching.md
 layout: center
 ---
 
-# Part 5: Rendering Strategies
+# Rendering Strategies
 
 SSR, SSG, ISR, and CSR explained 🎨
 
@@ -116,7 +128,7 @@ src: ./contents/05-rendering.md
 layout: center
 ---
 
-# Part 6: API Routes & Backend
+# API Routes & Backend
 
 Building full-stack applications 🔌
 
@@ -128,24 +140,12 @@ src: ./contents/06-api.md
 layout: center
 ---
 
-# Part 7: Optimization & Performance
+# Optimization & Performance
 
 Making your app blazingly fast ⚡
 
 ---
 src: ./contents/07-optimization.md
----
-
----
-layout: center
----
-
-# Part 8: Deployment & Production
-
-Taking your app live 🚀
-
----
-src: ./contents/08-deployment.md
 ---
 
 ---

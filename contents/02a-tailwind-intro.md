@@ -1,4 +1,7 @@
-# Introduction to Tailwind CSS
+---
+layout: center
+---
+# Tailwind CSS
 
 **Utility-First CSS Framework**
 
@@ -15,6 +18,51 @@
 - Created by Adam Wathan in 2017
 
 </v-clicks>
+
+---
+
+# Tailwind vs Bootstrap
+
+<div class="grid grid-cols-2 gap-8">
+
+<div>
+
+## Bootstrap
+
+```jsx
+<button class="btn btn-primary btn-lg">
+  Click Me
+</button>
+```
+
+- Pre-built components (buttons, cards, navbars)
+- Opinionated design - looks "Bootstrap-y"
+- Faster prototyping
+- Harder to customize deeply
+- Larger bundle size
+
+</div>
+
+<div>
+
+## Tailwind
+
+```jsx
+<button class="bg-blue-500 text-white px-6 py-3
+               rounded-lg text-lg hover:bg-blue-600">
+  Click Me
+</button>
+```
+
+- Utility classes, build your own components
+- No default look - fully custom designs
+- More flexible, more control
+- Smaller production bundle (purges unused)
+- Modern React/Next.js ecosystem favorite
+
+</div>
+
+</div>
 
 ---
 
@@ -88,17 +136,26 @@ Instead of writing custom CSS, you compose styles using utility classes:
 </button>
 ```
 
-Breaking it down:
+<div class="grid grid-cols-2 gap-4 text-sm mt-4">
 
-| Class | What it does |
-|-------|-------------|
-| `bg-blue-500` | Background color (blue, shade 500) |
-| `hover:bg-blue-700` | Darker blue on hover |
-| `text-white` | White text color |
-| `font-bold` | Bold font weight |
-| `py-2` | Padding top & bottom (0.5rem) |
-| `px-4` | Padding left & right (1rem) |
-| `rounded` | Border radius |
+<div>
+
+- `bg-blue-500` → blue background
+- `hover:bg-blue-700` → darker on hover
+- `text-white` → white text
+- `font-bold` → bold weight
+
+</div>
+
+<div>
+
+- `py-2` → padding top/bottom
+- `px-4` → padding left/right
+- `rounded` → border radius
+
+</div>
+
+</div>
 
 ---
 
@@ -216,24 +273,37 @@ Tailwind provides a consistent color palette:
 
 Tailwind uses **mobile-first** breakpoints:
 
-| Prefix | Min Width | Typical Device |
-|--------|-----------|----------------|
-| (none) | 0px | Mobile (default) |
-| `sm:` | 640px | Large phones |
-| `md:` | 768px | Tablets |
-| `lg:` | 1024px | Laptops |
-| `xl:` | 1280px | Desktops |
-| `2xl:` | 1536px | Large screens |
+<div class="grid grid-cols-2 gap-4">
 
-```jsx
-<div className="text-sm md:text-base lg:text-lg">
-  Responsive text size
+<div>
+
+| Prefix | Min Width |
+|--------|-----------|
+| (none) | Mobile default |
+| `sm:` | 640px |
+| `md:` | 768px |
+| `lg:` | 1024px |
+| `xl:` | 1280px |
+
 </div>
 
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+<div>
+
+```jsx
+// Mobile-first: base → larger screens
+<div className="text-sm md:text-base lg:text-lg">
+  Responsive text
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2
+                lg:grid-cols-4">
   Responsive grid
 </div>
 ```
+
+</div>
+
+</div>
 
 ---
 

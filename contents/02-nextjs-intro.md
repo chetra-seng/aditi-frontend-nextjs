@@ -1,6 +1,16 @@
-# Enter Next.js
 
-**The React Framework for Production**
+# What is Next.js?
+
+<v-clicks>
+
+- **A React framework** built by Vercel
+- **Production-ready** out of the box
+- **Solves all the limitations** we just discussed
+- **Full-stack** framework (frontend + backend)
+- **Highly optimized** by default
+- **Great developer experience**
+
+</v-clicks>
 
 ---
 
@@ -17,6 +27,7 @@
 - **2022** - Next.js 13 with App Router
 - **2023** - Server Actions, Partial Prerendering
 - **2024** - Next.js 15 with React 19
+- **2025** - Next.js 16 with Turbopack, React 19.2 (current)
 
 </div>
 
@@ -41,82 +52,49 @@ Guillermo Rauch (Vercel CEO) saw that React alone wasn't enough for production:
 
 # Who Uses Next.js?
 
-<div class="grid grid-cols-4 gap-4 text-center">
+<div class="grid grid-cols-4 gap-8 text-center mt-4">
 
-<div>
-
-**Netflix**
-Streaming platform
-
+<div class="flex flex-col items-center">
+<img src="https://cdn.simpleicons.org/netflix" class="w-12 h-12 mb-2" />
+<strong>Netflix</strong>
 </div>
 
-<div>
-
-**TikTok**
-Web experience
-
+<div class="flex flex-col items-center">
+<img src="https://cdn.simpleicons.org/tiktok" class="w-12 h-12 mb-2" />
+<strong>TikTok</strong>
 </div>
 
-<div>
-
-**Notion**
-Productivity app
-
+<div class="flex flex-col items-center">
+<img src="https://cdn.simpleicons.org/notion/white" class="w-12 h-12 mb-2" />
+<strong>Notion</strong>
 </div>
 
-<div>
-
-**Hulu**
-Media streaming
-
+<div class="flex flex-col items-center">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/ChatGPT-Logo.svg/960px-ChatGPT-Logo.svg.png" class="w-12 h-12 mb-2 rounded" />
+<strong>ChatGPT</strong>
 </div>
 
+<div class="flex flex-col items-center">
+<img src="https://cdn.simpleicons.org/nike" class="w-12 h-12 mb-2" />
+<strong>Nike</strong>
 </div>
 
-<div class="grid grid-cols-4 gap-4 text-center mt-4">
-
-<div>
-
-**Nike**
-E-commerce
-
+<div class="flex flex-col items-center">
+<img src="https://cdn.simpleicons.org/twitch" class="w-12 h-12 mb-2" />
+<strong>Twitch</strong>
 </div>
 
-<div>
-
-**Twitch**
-Gaming platform
-
+<div class="flex flex-col items-center">
+<img src="https://cdn.simpleicons.org/target" class="w-12 h-12 mb-2" />
+<strong>Target</strong>
 </div>
 
-<div>
-
-**Target**
-Retail giant
-
-</div>
-
-<div>
-
-**Washington Post**
-News media
-
+<div class="flex flex-col items-center">
+<img src="https://cdn.simpleicons.org/thewashingtonpost" class="w-12 h-12 mb-2" />
+<strong>Washington Post</strong>
 </div>
 
 </div>
-
-# What is Next.js?
-
-<v-clicks>
-
-- **A React framework** built by Vercel
-- **Production-ready** out of the box
-- **Solves all the limitations** we just discussed
-- **Full-stack** framework (frontend + backend)
-- **Highly optimized** by default
-- **Great developer experience**
-
-</v-clicks>
 
 ---
 
@@ -126,35 +104,41 @@ News media
 
 <div>
 
-## React Problem → Next.js Solution
 
-**SEO Issues**
-✓ Server-Side Rendering (SSR)
+**SEO Issues** <br />
+✅ Server-Side Rendering (SSR)
 
-**Performance**
-✓ Automatic Code Splitting
+**Performance** <br />
 
-**Routing**
-✓ File-based Routing
+✅ Automatic Code Splitting
 
-**Data Fetching**
-✓ Server Components
+**Routing** <br />
+
+✅ File-based Routing
+
+**Data Fetching** <br />
+
+✅ Server Components
 
 </div>
 
 <div>
 
-**API Security**
-✓ API Routes & Server Actions
+**API Security** <br />
 
-**Image Optimization**
-✓ Built-in Image Component
+✅ API Routes & Server Actions
 
-**Build Output**
-✓ Static & Dynamic Rendering
+**Image Optimization** <br />
 
-**Code Organization**
-✓ App Router Structure
+✅ Built-in Image Component
+
+**Build Output** <br />
+
+✅ Static & Dynamic Rendering
+
+**Code Organization** <br />
+
+✅ App Router Structure
 
 </div>
 
@@ -212,6 +196,13 @@ npm run dev
 
 App running at http://localhost:3000
 
+<v-clicks>
+<div class="p-4 bg-blue-500/20 rounded-lg">
+  💡 What is Tailwind CSS?
+</div>
+</v-clicks>
+---
+src: ./02a-tailwind-intro.md
 ---
 
 # Project Structure
@@ -231,8 +222,6 @@ my-next-app/
 └── tailwind.config.ts     # Tailwind config
 ```
 
----
-src: ./01b-tailwind-intro.md
 ---
 
 # App Router vs Pages Router
@@ -288,60 +277,187 @@ app/
 
 ---
 
-# Understanding app/page.tsx
+# Data Fetching: Pages vs App Router
 
+````md magic-move
 ```tsx
-// app/page.tsx - Your home page
-export default function Home() {
+// Pages Router - pages/products.tsx
+import { GetServerSideProps } from 'next';
+
+interface Props {
+  products: Product[];
+}
+
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+  const res = await fetch('https://api.example.com/products');
+  const products = await res.json();
+
+  return {
+    props: { products }
+  };
+};
+
+export default function ProductsPage({ products }: Props) {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold">Welcome to Next.js!</h1>
-      <p className="mt-4 text-lg">
-        The React Framework for Production
-      </p>
-    </main>
+    <div>
+      {products.map(p => <div key={p.id}>{p.name}</div>)}
+    </div>
   );
 }
 ```
 
-<v-clicks>
+```tsx
+// App Router - app/products/page.tsx
 
-- **File name `page.tsx`** makes it a route
-- **Default export** is the component
-- **Server Component** by default
-- **TypeScript** support out of the box
 
-</v-clicks>
+
+async function getProducts() {
+  const res = await fetch('https://api.example.com/products');
+  return res.json();
+}
+
+
+
+export default async function ProductsPage() {
+  const products = await getProducts();
+
+  return (
+    <div>
+      {products.map(p => <div key={p.id}>{p.name}</div>)}
+    </div>
+  );
+}
+```
+
+```tsx
+// App Router - Even simpler! 🎉
+
+
+
+export default async function ProductsPage() {
+  const res = await fetch('https://api.example.com/products');
+  const products = await res.json();
+
+  return (
+    <div>
+      {products.map(p => <div key={p.id}>{p.name}</div>)}
+    </div>
+  );
+}
+```
+````
+
+---
+layout: center
+---
+
+# Server vs Client Components
+
+Understanding the rendering model 🖥️
 
 ---
 
-# Understanding app/layout.tsx
+# How Next.js Renders a Page
+
+```
+Browser Request: /products
+        │
+        ▼
+┌─────────────────────────────────────────────────┐
+│                    SERVER                        │
+│                                                  │
+│  1. layout.tsx    ─── Renders shell (HTML/body) │
+│        │                                         │
+│        ▼                                         │
+│  2. page.tsx      ─── Fetches data, renders UI  │
+│        │                                         │
+│        ▼                                         │
+│  3. Components    ─── Server components render  │
+│                                                  │
+└─────────────────────────────────────────────────┘
+        │
+        ▼ HTML + minimal JS sent to browser
+┌─────────────────────────────────────────────────┐
+│                   BROWSER                        │
+│                                                  │
+│  4. Client Components hydrate (become interactive)│
+│                                                  │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+# Server vs Client Components
+
+<div class="grid grid-cols-2 gap-8">
+
+<div>
+
+## Server Components (Default)
+
+- Run **only on the server**
+- Can fetch data directly
+- Can access backend resources
+- **Zero JavaScript** sent to browser
+- Cannot use hooks or browser APIs
 
 ```tsx
-// app/layout.tsx - Root layout wraps all pages
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-
-const inter = Inter({ subsets: ['latin'] });
-
-export const metadata: Metadata = {
-  title: 'My Next.js App',
-  description: 'Built with Next.js',
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
-  );
+// No directive needed - default!
+async function ProductList() {
+  const products = await db.query();
+  return <ul>...</ul>;
 }
 ```
+
+</div>
+
+<div>
+
+## Client Components
+
+- Run on **server + browser**
+- Enable interactivity
+- Can use React hooks
+- Add JavaScript to bundle
+
+```tsx
+'use client'; // ← Required!
+
+function Counter() {
+  const [count, setCount] = useState(0);
+  return <button onClick={...}>
+}
+```
+
+</div>
+
+</div>
+
+---
+
+# The Component Tree
+
+```
+         layout.tsx (Server)
+              │
+              ▼
+         page.tsx (Server)
+         ┌────┴────┐
+         │         │
+    ProductList  Sidebar
+     (Server)    (Server)
+         │
+    ┌────┴────┐
+    │         │
+ProductCard  AddToCart
+ (Server)    (Client) ← 'use client'
+                │
+           useState, onClick
+```
+
+**Rule:** Client components can only import other client components
+
+**Tip:** Keep client components as leaves in your tree
 
 ---
 
@@ -350,15 +466,14 @@ export default function RootLayout({
 ```tsx
 // app/page.tsx - This is a Server Component!
 export default async function HomePage() {
-  // ✅ This runs on the SERVER
-  const data = await fetch('https://api.example.com/data');
-  const products = await data.json();
+  // ✅ Runs on the SERVER - never exposed to browser
+  const products = await db.products.findMany();
 
   return (
     <div>
       <h1>Products</h1>
       {products.map(product => (
-        <div key={product.id}>{product.name}</div>
+        <ProductCard key={product.id} product={product} />
       ))}
     </div>
   );
@@ -367,11 +482,10 @@ export default async function HomePage() {
 
 <v-clicks>
 
-- **Runs on the server**
-- Can directly access databases
-- Smaller JavaScript bundles
-- Better performance
-- SEO-friendly
+- **No loading spinners** - data ready on first render
+- **No API endpoints** needed for internal data
+- **Secrets stay secret** - server code never reaches browser
+- **SEO-friendly** - full HTML sent to crawlers
 
 </v-clicks>
 
@@ -407,6 +521,62 @@ export default function Counter() {
 - Interactive UI
 
 </v-clicks>
+
+---
+
+# Understanding app/page.tsx
+
+```tsx
+// app/page.tsx - Your home page (Server Component!)
+export default function Home() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center">
+      <h1 className="text-4xl font-bold">Welcome to Next.js!</h1>
+      <p className="mt-4 text-lg">
+        The React Framework for Production
+      </p>
+    </main>
+  );
+}
+```
+
+<v-clicks>
+
+- **File name `page.tsx`** makes it a route
+- **Default export** is the component
+- **Server Component** by default - can be `async`!
+- **TypeScript** support out of the box
+
+</v-clicks>
+
+---
+
+# Understanding app/layout.tsx
+
+```tsx
+// app/layout.tsx - Root layout wraps all pages
+import type { Metadata } from 'next';
+import './globals.css';
+
+export const metadata: Metadata = {
+  title: 'My Next.js App',
+  description: 'Built with Next.js',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+Layouts are **Server Components** - they wrap pages and persist across navigation.
 
 ---
 

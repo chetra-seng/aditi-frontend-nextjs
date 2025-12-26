@@ -27,6 +27,8 @@ Before we dive into React's limitations, let's explore a real React SPA together
 </div>
 
 ---
+layout: center
+---
 
 # React App: Initial Load 🔄
 
@@ -286,14 +288,8 @@ Total First Load:   1.25 MB
 ## Loading Waterfalls
 
 ```mermaid
-graph TD
-    A[HTML Request] --> B[HTML Response]
-    B --> C[JS Bundle Request]
-    C --> D[JS Bundle Response]
-    D --> E[Parse & Execute JS]
-    E --> F[API Request]
-    F --> G[API Response]
-    G --> H[Render Content]
+graph LR
+    A[HTML] --> B[JS Bundle] --> C[Parse JS] --> D[API Call] --> E[Content]
 ```
 
 Each step waits for the previous one!
@@ -341,24 +337,15 @@ function App() {
 function ProductPage({ productId }) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    setLoading(true);
     fetch(`/api/products/${productId}`)
       .then(res => res.json())
-      .then(data => {
-        setProduct(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err);
-        setLoading(false);
-      });
+      .then(data => setProduct(data))
+      .finally(() => setLoading(false));
   }, [productId]);
 
   if (loading) return <Spinner />;
-  if (error) return <Error />;
   return <ProductDetails product={product} />;
 }
 ```

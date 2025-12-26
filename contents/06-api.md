@@ -157,10 +157,11 @@ export async function DELETE(request: NextRequest) {
 // app/api/posts/[id]/route.ts
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const post = await db.post.findUnique({
-    where: { id: params.id }
+    where: { id }
   });
 
   if (!post) {
@@ -175,11 +176,12 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const body = await request.json();
   const post = await db.post.update({
-    where: { id: params.id },
+    where: { id },
     data: body,
   });
 
@@ -364,14 +366,14 @@ export async function POST(request: NextRequest) {
 
 ---
 
-# Middleware
+# Proxy (formerly Middleware)
 
 ```tsx
-// middleware.ts
+// proxy.ts (renamed from middleware.ts in Next.js 16)
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Check authentication
   const token = request.cookies.get('token');
 
@@ -393,7 +395,9 @@ export const config = {
 
 <v-clicks>
 
-Runs **before** every request!
+Runs **before** every request on **Node.js runtime**!
 Perfect for auth, redirects, headers.
+
+**Note:** Renamed from `middleware.ts` → `proxy.ts` in Next.js 16.
 
 </v-clicks>

@@ -206,14 +206,16 @@ app/
 
 ```tsx
 // app/blog/[slug]/page.tsx
-export default function BlogPost({
+export default async function BlogPost({
   params
 }: {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }) {
+  const { slug } = await params;
+
   return (
     <article>
-      <h1>Blog Post: {params.slug}</h1>
+      <h1>Blog Post: {slug}</h1>
     </article>
   );
 }
@@ -242,15 +244,17 @@ app/
 
 ```tsx
 // app/shop/[category]/[productId]/page.tsx
-export default function ProductPage({
+export default async function ProductPage({
   params
 }: {
-  params: { category: string; productId: string }
+  params: Promise<{ category: string; productId: string }>
 }) {
+  const { category, productId } = await params;
+
   return (
     <div>
-      <h1>Category: {params.category}</h1>
-      <h2>Product ID: {params.productId}</h2>
+      <h1>Category: {category}</h1>
+      <h2>Product ID: {productId}</h2>
     </div>
   );
 }
@@ -264,14 +268,16 @@ export default function ProductPage({
 
 ```tsx
 // app/docs/[...slug]/page.tsx
-export default function DocsPage({
+export default async function DocsPage({
   params
 }: {
-  params: { slug: string[] }
+  params: Promise<{ slug: string[] }>
 }) {
+  const { slug } = await params;
+
   return (
     <div>
-      <h1>Docs Path: {params.slug.join('/')}</h1>
+      <h1>Docs Path: {slug.join('/')}</h1>
     </div>
   );
 }
@@ -292,12 +298,13 @@ export default function DocsPage({
 
 ```tsx
 // app/docs/[[...slug]]/page.tsx
-export default function DocsPage({
+export default async function DocsPage({
   params
 }: {
-  params: { slug?: string[] }
+  params: Promise<{ slug?: string[] }>
 }) {
-  const path = params.slug ? params.slug.join('/') : 'home';
+  const { slug } = await params;
+  const path = slug ? slug.join('/') : 'home';
 
   return <h1>Docs: {path}</h1>;
 }
@@ -690,8 +697,13 @@ export default function NotFound() {
 // Trigger it in page.tsx
 import { notFound } from 'next/navigation';
 
-export default async function BlogPost({ params }: { params: { slug: string } }) {
-  const post = await getPost(params.slug);
+export default async function BlogPost({
+  params
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params;
+  const post = await getPost(slug);
 
   if (!post) {
     notFound(); // Triggers not-found.tsx

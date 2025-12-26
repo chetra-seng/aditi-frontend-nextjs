@@ -162,9 +162,10 @@ export async function generateStaticParams() {
 export default async function BlogPost({
   params
 }: {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }) {
-  const post = await fetchPost(params.slug);
+  const { slug } = await params;
+  const post = await fetchPost(slug);
 
   return (
     <article>
@@ -254,11 +255,13 @@ export default async function Dashboard() {
 export default async function ProductPage({
   params
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const { id } = await params;
+
   // Fetch data with revalidation
   const product = await fetch(
-    `https://api.example.com/products/${params.id}`,
+    `https://api.example.com/products/${id}`,
     { next: { revalidate: 60 } } // Revalidate every 60 seconds
   );
 
@@ -377,9 +380,14 @@ export const revalidate = 0;
 // Page is static
 export const dynamic = 'force-static';
 
-export default async function ProductPage({ params }: { params: { id: string } }) {
+export default async function ProductPage({
+  params
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params;
   // Static product data
-  const product = await fetchProduct(params.id);
+  const product = await fetchProduct(id);
 
   return (
     <div>
@@ -388,7 +396,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
       <p>{product.description}</p>
 
       {/* Client-side interactive reviews */}
-      <ClientReviews productId={params.id} />
+      <ClientReviews productId={id} />
 
       {/* Client-side "Add to Cart" */}
       <AddToCartButton product={product} />

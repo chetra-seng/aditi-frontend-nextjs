@@ -252,24 +252,26 @@ export default async function UsersPage() {
 # Fetch with Caching
 
 ```tsx
-// Cached by default (force-cache)
+// No caching by default (Next.js 16+)
 const data = await fetch('https://api.example.com/data');
 
-// Revalidate every 60 seconds
+// Revalidate every 60 seconds (time-based caching)
 const data = await fetch('https://api.example.com/data', {
   next: { revalidate: 60 }
 });
 
-// Never cache (always fresh)
+// Force caching (explicit opt-in)
 const data = await fetch('https://api.example.com/data', {
-  cache: 'no-store'
+  cache: 'force-cache'
 });
 
-// Revalidate with tag
+// Revalidate with tag (for on-demand revalidation)
 const data = await fetch('https://api.example.com/data', {
   next: { tags: ['products'] }
 });
 ```
+
+**Note:** Next.js 16 uses explicit opt-in caching with the `"use cache"` directive.
 
 ---
 
@@ -304,9 +306,15 @@ export default async function Dashboard() {
 # Sequential Data Fetching
 
 ```tsx
-export default async function BlogPost({ params }: { params: { slug: string } }) {
+export default async function BlogPost({
+  params
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params;
+
   // Fetch post first
-  const post = await fetchPost(params.slug);
+  const post = await fetchPost(slug);
 
   // Then fetch author (depends on post data)
   const author = await fetchAuthor(post.authorId);
