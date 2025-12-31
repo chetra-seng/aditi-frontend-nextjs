@@ -1,40 +1,17 @@
 # What We Learned
 
-<div class="grid grid-cols-2 gap-4 text-left">
+<v-clicks>
 
-<div>
+- React limitations & why Next.js exists
+- Project setup & App Router basics
+- File-based routing & dynamic routes
+- Navigation & data fetching patterns
+- SSR, SSG, ISR rendering strategies
+- API routes, Server Actions & Middleware
+- Image optimization & SEO
+- Deployment & best practices
 
-## Hours 1-2
-- React limitations
-- Why Next.js exists
-- Project setup
-- App Router basics
-
-## Hours 3-4
-- File-based routing
-- Dynamic routes
-- Navigation
-- Data fetching patterns
-
-</div>
-
-<div>
-
-## Hours 5-6
-- SSR, SSG, ISR
-- API routes
-- Server Actions
-- Middleware
-
-## Hours 7-8
-- Image optimization
-- SEO & metadata
-- Deployment
-- Best practices
-
-</div>
-
-</div>
+</v-clicks>
 
 ---
 
@@ -70,6 +47,7 @@
 - Official docs: nextjs.org/docs
 - Examples: github.com/vercel/next.js/tree/canary/examples
 - Tutorials: youtube.com/@leerob
+- Web Dev Simplified: youtube.com/c/WebDevSimplified
 
 </v-clicks>
 

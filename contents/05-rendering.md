@@ -149,66 +149,25 @@ Next.js lets you choose **per page**!
 ```tsx
 // app/blog/[slug]/page.tsx
 
-// Generate static paths at build time
+// Generate all paths at build time
 export async function generateStaticParams() {
   const posts = await fetchAllPosts();
-
-  return posts.map(post => ({
-    slug: post.slug,
-  }));
+  return posts.map(post => ({ slug: post.slug }));
 }
 
-// This page is pre-rendered at build time
-export default async function BlogPost({
-  params
-}: {
-  params: Promise<{ slug: string }>
-}) {
+// Pre-rendered to HTML at build time
+export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = await fetchPost(slug);
-
-  return (
-    <article>
-      <h1>{post.title}</h1>
-      <div>{post.content}</div>
-    </article>
-  );
+  return <article><h1>{post.title}</h1><div>{post.content}</div></article>;
 }
-```
-
-✅ **Fastest** - pre-built HTML files
-✅ **Best for** blogs, docs, marketing pages
-
----
-
-# When SSG Runs
-
-```bash
-# Build time
-npm run build
-
-# Next.js generates:
-.next/
-  server/
-    pages/
-      blog/
-        post-1.html  # ✅ Pre-rendered!
-        post-2.html  # ✅ Pre-rendered!
-        post-3.html  # ✅ Pre-rendered!
 ```
 
 <v-clicks>
 
-**Perfect for:**
-- Blog posts
-- Documentation
-- Marketing pages
-- Product catalogs (updated infrequently)
-
-**Avoid when:**
-- Data changes frequently
-- User-specific content
-- Millions of pages
+- ✅ **Fastest** - serves pre-built HTML files
+- ✅ **Best for:** blogs, docs, marketing pages
+- ❌ **Avoid when:** data changes frequently, user-specific content
 
 </v-clicks>
 
@@ -238,10 +197,10 @@ export default async function Dashboard() {
 
 <v-clicks>
 
-✅ **Always fresh** data
-✅ **Personalized** content
-✅ **SEO-friendly**
-❌ Slower than SSG (renders on each request)
+- ✅ **Always fresh** data
+- ✅ **Personalized** content
+- ✅ **SEO-friendly**
+- ❌ Slower than SSG (renders on each request)
 
 </v-clicks>
 
@@ -249,36 +208,52 @@ export default async function Dashboard() {
 
 # Incremental Static Regeneration (ISR)
 
+<div class="grid grid-cols-2 gap-4">
+
+<div>
+
+## Option 1: Page-level
+
 ```tsx
-// app/products/[id]/page.tsx
+// Entire page revalidates every 60s
+export const revalidate = 60;
 
-export default async function ProductPage({
-  params
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const { id } = await params;
-
-  // Fetch data with revalidation
-  const product = await fetch(
-    `https://api.example.com/products/${id}`,
-    { next: { revalidate: 60 } } // Revalidate every 60 seconds
-  );
-
-  return (
-    <div>
-      <h1>{product.name}</h1>
-      <p>${product.price}</p>
-    </div>
-  );
+export default async function Page() {
+  const data = await fetchData();
+  return <div>{data}</div>;
 }
 ```
 
+Applies to **all data** on the page
+
+</div>
+
+<div>
+
+## Option 2: Fetch-level
+
+```tsx
+export default async function Page() {
+  const data = await fetch(url, {
+    next: { revalidate: 60 }
+  });
+  return <div>{data}</div>;
+}
+```
+
+**Per-request** control
+
+</div>
+
+</div>
+
 <v-clicks>
 
-✅ **Static + Dynamic** - best of both worlds
-✅ **Stale-while-revalidate** strategy
-✅ Regenerates pages in the background
+- ✅ **Page-level** - simple, one setting for everything
+- ✅ **Fetch-level** - granular (e.g., products: 60s, categories: 3600s)
+- ✅ **Static speed** - serves cached HTML instantly
+- ✅ **Fresh data** - regenerates in background without blocking users
+- ✅ **Best for:** e-commerce, news, content that updates periodically
 
 </v-clicks>
 
@@ -286,58 +261,97 @@ export default async function ProductPage({
 
 # How ISR Works
 
-```
-User Request → Static Page Served (instant!)
-    ↓
-Is page older than revalidate time?
-    ↓
-YES → Regenerate in background
-    ↓
-Next user gets fresh page
-```
+<div class="flex items-center justify-center gap-3 mt-8">
+  <v-click>
+    <div class="px-4 py-3 bg-blue-500 text-white rounded-lg shadow-lg">
+      <div class="font-bold">1. User Request</div>
+      <div class="text-xs opacity-80">Browser requests page</div>
+    </div>
+  </v-click>
+  <v-click><div class="text-2xl">→</div></v-click>
+  <v-click>
+    <div class="px-4 py-3 bg-green-500 text-white rounded-lg shadow-lg">
+      <div class="font-bold">2. Serve Cache</div>
+      <div class="text-xs opacity-80">Instant! No waiting</div>
+    </div>
+  </v-click>
+  <v-click><div class="text-2xl">→</div></v-click>
+  <v-click>
+    <div class="px-4 py-3 bg-yellow-500 text-black rounded-lg shadow-lg">
+      <div class="font-bold">3. Check Age</div>
+      <div class="text-xs opacity-80">Is cache older than revalidate?</div>
+    </div>
+  </v-click>
+</div>
 
-<v-clicks>
+<div class="flex justify-center mt-6">
+  <v-click><div class="text-xl font-bold text-yellow-400">↓ YES, cache is stale</div></v-click>
+</div>
 
-**Example with revalidate: 60**
-- 0:00 - User A visits → Gets static page (built at deploy)
-- 0:30 - User B visits → Gets same static page (still fresh)
-- 1:10 - User C visits → Gets static page + triggers regeneration
-- 1:15 - User D visits → Gets newly regenerated page!
+<div class="flex items-center justify-center gap-3 mt-6">
+  <v-click>
+    <div class="px-4 py-3 bg-purple-500 text-white rounded-lg shadow-lg">
+      <div class="font-bold">4. Background Regeneration</div>
+      <div class="text-xs opacity-80">Server rebuilds page async</div>
+    </div>
+  </v-click>
+  <v-click><div class="text-2xl">→</div></v-click>
+  <v-click>
+    <div class="px-4 py-3 bg-green-600 text-white rounded-lg shadow-lg">
+      <div class="font-bold">5. Cache Updated</div>
+      <div class="text-xs opacity-80">Next visitor gets fresh page</div>
+    </div>
+  </v-click>
+</div>
 
-</v-clicks>
+<v-click>
+<div class="mt-8 text-center">
+  <span class="px-4 py-2 bg-gray-800 text-green-400 rounded-full font-bold">✨ User is NEVER blocked - always instant response!</span>
+</div>
+</v-click>
 
 ---
 
-# Client-Side Rendering (CSR)
+# CSR with React Query
 
 ```tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-export default function ClientOnlyComponent() {
-  const [data, setData] = useState(null);
+export default function Dashboard() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['user-stats'],
+    queryFn: () => fetch('/api/stats').then(res => res.json()),
+    refetchInterval: 30000, // Auto-refresh every 30s
+  });
 
-  useEffect(() => {
-    // Only runs in the browser
-    fetch('/api/data')
-      .then(res => res.json())
-      .then(setData);
-  }, []);
+  if (isLoading) return <Skeleton />;
+  if (error) return <Error message={error.message} />;
 
-  if (!data) return <div>Loading...</div>;
-
-  return <div>{data.message}</div>;
+  return <StatsDisplay data={data} />;
 }
 ```
 
 <v-clicks>
 
-Use when:
-- Need browser APIs
-- Highly interactive
-- SEO not important
-- User-specific dashboards
+- ✅ **Caching** - no duplicate requests
+- ✅ **Auto-refresh** - keeps data fresh
+- ✅ **Loading/error states** - built-in handling
+
+</v-clicks>
+
+---
+
+# Why Client-Side Rendering (CSR)?
+
+<v-clicks>
+
+- ✅ **Real-time updates** - live data, notifications, chat
+- ✅ **Browser APIs** - geolocation, camera, localStorage
+- ✅ **User interactions** - forms, filters, infinite scroll
+- ✅ **Personalized content** - dashboards after login
+- ❌ **SEO not needed** - admin panels, authenticated pages
 
 </v-clicks>
 
@@ -372,40 +386,99 @@ export const revalidate = 0;
 
 ---
 
-# Hybrid Rendering Example
+# Hybrid Rendering: ISR + CSR
 
 ```tsx
 // app/product/[id]/page.tsx
 
-// Page is static
-export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate product data every hour
 
-export default async function ProductPage({
-  params
-}: {
-  params: Promise<{ id: string }>
-}) {
+export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  // Static product data
-  const product = await fetchProduct(id);
+  const product = await fetchProduct(id); // Cached + revalidated
 
   return (
     <div>
-      {/* Static content */}
+      {/* ISR: Product info refreshes every hour */}
       <h1>{product.name}</h1>
-      <p>{product.description}</p>
+      <p>${product.price}</p>
 
-      {/* Client-side interactive reviews */}
+      {/* CSR: Real-time stock updates */}
+      <StockStatus productId={id} />
+
+      {/* CSR: Live reviews with React Query */}
       <ClientReviews productId={id} />
-
-      {/* Client-side "Add to Cart" */}
-      <AddToCartButton product={product} />
     </div>
   );
 }
 ```
 
-**Static shell + Dynamic interactivity!**
+**ISR for product data + CSR for real-time features!**
+
+---
+
+# CSR: StockStatus Component
+
+```tsx
+// components/StockStatus.tsx
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+
+export function StockStatus({ productId }: { productId: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['stock', productId],
+    queryFn: () => fetch(`/api/stock/${productId}`).then(r => r.json()),
+    refetchInterval: 5000, // Poll every 5 seconds
+  });
+
+  if (isLoading) return <span>Checking stock...</span>;
+
+  return <span>{data?.inStock ? '✅ In Stock' : '❌ Out of Stock'}</span>;
+}
+```
+
+<v-clicks>
+
+- ✅ **Real-time polling** - updates every 5 seconds
+- ✅ **Never stale** - always shows current stock
+- ✅ **User sees live changes** - no page refresh needed
+
+</v-clicks>
+
+---
+
+# CSR: ClientReviews Component
+
+```tsx
+// components/ClientReviews.tsx
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+
+export function ClientReviews({ productId }: { productId: string }) {
+  const { data: reviews, isLoading } = useQuery({
+    queryKey: ['reviews', productId],
+    queryFn: () => fetch(`/api/reviews/${productId}`).then(r => r.json()),
+  });
+
+  if (isLoading) return <ReviewsSkeleton />;
+
+  return (
+    <ul>
+      {reviews?.map(r => <li key={r.id}>⭐ {r.text}</li>)}
+    </ul>
+  );
+}
+```
+
+<v-clicks>
+
+- ✅ **Loaded after page renders** - doesn't block ISR
+- ✅ **Cached by React Query** - instant on revisit
+- ✅ **Can add mutations** - submit new reviews without page reload
+
+</v-clicks>
 
 ---
 

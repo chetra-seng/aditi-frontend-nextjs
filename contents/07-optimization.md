@@ -98,11 +98,11 @@ export default function Hero() {
 
 <v-clicks>
 
-✅ **Automatic optimization** (WebP, AVIF)
-✅ **Responsive images** (srcset)
-✅ **Lazy loading** by default
-✅ **Blur placeholder**
-✅ **No layout shift**
+- ✅ **Automatic optimization** (WebP, AVIF)
+- ✅ **Responsive images** (srcset)
+- ✅ **Lazy loading** by default
+- ✅ **Blur placeholder**
+- ✅ **No layout shift**
 
 </v-clicks>
 
@@ -134,63 +134,46 @@ Next.js automatically:
 
 ```tsx
 // app/layout.tsx
-import { Inter, Roboto_Mono } from 'next/font/google';
+import { Inter } from 'next/font/google';
 
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-});
+const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
-const robotoMono = Roboto_Mono({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-roboto-mono',
-});
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} ${robotoMono.variable}`}>
+    <html lang="en">
       <body className={inter.className}>{children}</body>
     </html>
   );
 }
 ```
 
-✅ **Automatic font optimization**
-✅ **Zero layout shift**
-✅ **Self-hosted** (no Google request)
+<v-clicks>
+
+- **Self-hosted** - no external Google request
+- **Zero layout shift** - font loads with page
+- **Automatic subsetting** - only characters you need
+
+</v-clicks>
 
 ---
 
 # SEO: The React Problem
 
-What search engines see when crawling a React SPA:
+What Google bot sees when crawling a React SPA:
 
 ```html
-<!-- Google bot sees this: -->
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>My App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script src="/bundle.js"></script>
-  </body>
-</html>
-
-<!-- No content! No meta tags! No structure! -->
+<body>
+  <div id="root"></div>  <!-- Empty! -->
+  <script src="/bundle.js"></script>
+</body>
 ```
 
 <v-clicks>
 
 **SEO Issues:**
 - Empty HTML = nothing to index
-- No meta descriptions for search results
-- No Open Graph tags for social sharing
+- No meta tags for search/social
 - Poor search rankings
-- No rich snippets
 
 </v-clicks>
 
@@ -234,7 +217,7 @@ my-nextjs-app.com
 
 </div>
 
-**Rich previews = more clicks = more traffic**
+<div class="bg-blue-500/20 px-4 py-2 text-white rounded mt-4">💡 Rich previews = more clicks = more traffic</div>
 
 ---
 
@@ -284,37 +267,28 @@ my-nextjs-app.com
 
 ```tsx
 // app/blog/[slug]/page.tsx
-import type { Metadata } from 'next';
-
-export async function generateMetadata({
-  params
-}: {
-  params: Promise<{ slug: string }>
-}): Promise<Metadata> {
+export async function generateMetadata({ params }): Promise<Metadata> {
   const { slug } = await params;
   const post = await fetchPost(slug);
 
   return {
     title: post.title,
     description: post.excerpt,
-    keywords: post.tags,
     openGraph: {
       title: post.title,
-      description: post.excerpt,
-      images: [post.image],
-      type: 'article',
-      publishedTime: post.publishedAt,
-      authors: [post.author.name],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: post.title,
-      description: post.excerpt,
       images: [post.image],
     },
   };
 }
 ```
+
+<v-clicks>
+
+- Dynamic metadata based on content
+- OpenGraph for social previews
+- Also supports `twitter`, `robots`, `icons`, etc.
+
+</v-clicks>
 
 ---
 
@@ -322,29 +296,14 @@ export async function generateMetadata({
 
 ```tsx
 // app/products/[id]/page.tsx
-export async function generateMetadata({
-  params
-}: {
-  params: Promise<{ id: string }>
-}): Promise<Metadata> {
+export async function generateMetadata({ params }): Promise<Metadata> {
   const { id } = await params;
-  const product = await db.product.findUnique({
-    where: { id },
-  });
+  const product = await db.product.findUnique({ where: { id } });
 
   return {
     title: `${product.name} - Shop`,
     description: product.description,
-    openGraph: {
-      images: [
-        {
-          url: product.image,
-          width: 1200,
-          height: 630,
-          alt: product.name,
-        },
-      ],
-    },
+    openGraph: { images: [{ url: product.image, width: 1200, height: 630 }] },
   };
 }
 ```
@@ -355,32 +314,21 @@ export async function generateMetadata({
 
 ```tsx
 // app/products/[id]/page.tsx
-export default async function ProductPage({ params }) {
-  const product = await getProduct(params.id);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: product.name,
+  image: product.image,
+  offers: { '@type': 'Offer', price: product.price, priceCurrency: 'USD' },
+};
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: product.name,
-    description: product.description,
-    image: product.image,
-    offers: {
-      '@type': 'Offer',
-      price: product.price,
-      priceCurrency: 'USD',
-    },
-  };
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <ProductDetails product={product} />
-    </>
-  );
-}
+return (
+  <>
+    <script type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+    <ProductDetails product={product} />
+  </>
+);
 ```
 
 **Enables rich snippets in Google search results!**
@@ -391,26 +339,15 @@ export default async function ProductPage({ params }) {
 
 ```tsx
 // app/sitemap.ts
-import { MetadataRoute } from 'next';
-
 export default async function sitemap(): MetadataRoute.Sitemap {
   const products = await db.product.findMany();
 
-  const productUrls = products.map((product) => ({
-    url: `https://myshop.com/products/${product.id}`,
-    lastModified: product.updatedAt,
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }));
-
   return [
-    {
-      url: 'https://myshop.com',
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    ...productUrls,
+    { url: 'https://myshop.com', changeFrequency: 'daily', priority: 1 },
+    ...products.map((p) => ({
+      url: `https://myshop.com/products/${p.id}`,
+      lastModified: p.updatedAt,
+    })),
   ];
 }
 ```
@@ -478,9 +415,9 @@ export default function Page() {
 
 ---
 
-# Code Splitting
+# Code Splitting (Automatic)
 
-Next.js automatically code-splits by:
+Next.js automatically code-splits by route:
 
 ```
 app/
@@ -491,7 +428,17 @@ app/
     └── page.tsx      → Separate bundle
 ```
 
-**Manual code splitting with dynamic imports:**
+<v-clicks>
+
+- Each page only loads its own JavaScript
+- Users don't download code they don't need
+- Faster initial page loads
+
+</v-clicks>
+
+---
+
+# Code Splitting (Dynamic Imports)
 
 ```tsx
 import dynamic from 'next/dynamic';
@@ -502,74 +449,87 @@ const HeavyComponent = dynamic(() => import('@/components/HeavyComponent'), {
 });
 
 export default function Page() {
-  return (
-    <div>
-      <h1>My Page</h1>
-      <HeavyComponent />
-    </div>
-  );
+  return <HeavyComponent />;
 }
 ```
 
+<v-clicks>
+
+- Load components only when needed
+- `ssr: false` for client-only components (maps, charts)
+
+</v-clicks>
+
 ---
 
-# Bundle Analyzer
+# Next.js Caching Layers
 
-```bash
-npm install @next/bundle-analyzer
-```
+<div class="grid grid-cols-2 gap-4 mt-6">
+  <v-click>
+    <div class="px-4 py-3 bg-blue-500 text-white rounded-lg shadow-lg">
+      <div class="font-bold">Server Components</div>
+      <div class="text-xs opacity-80">Cached at build time (SSG) or revalidated (ISR)</div>
+    </div>
+  </v-click>
+  <v-click>
+    <div class="px-4 py-3 bg-green-500 text-white rounded-lg shadow-lg">
+      <div class="font-bold">fetch()</div>
+      <div class="text-xs opacity-80">`next: { revalidate }` or `cache: 'force-cache'`</div>
+    </div>
+  </v-click>
+  <v-click>
+    <div class="px-4 py-3 bg-yellow-500 text-black rounded-lg shadow-lg">
+      <div class="font-bold">API Routes</div>
+      <div class="text-xs opacity-80">Set `Cache-Control` headers in Response</div>
+    </div>
+  </v-click>
+  <v-click>
+    <div class="px-4 py-3 bg-purple-500 text-white rounded-lg shadow-lg">
+      <div class="font-bold">Router Cache</div>
+      <div class="text-xs opacity-80">Client-side navigation cache (automatic)</div>
+    </div>
+  </v-click>
+</div>
 
-```js
-// next.config.js
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
-
-module.exports = withBundleAnalyzer({
-  // your next config
-});
-```
-
-```bash
-# Analyze your bundle (with webpack)
-ANALYZE=true npm run build --webpack
-
-# Turbopack is now default in Next.js 16
-# Use experimental Turbopack analyzer in next.config.js
-```
-
-Opens interactive treemap showing bundle composition!
-
-**Note:** Turbopack is now the default bundler in Next.js 16 (2-5x faster builds).
+<v-click>
+<div class="mt-8 text-center">
+  <span class="px-4 py-2 bg-gray-800 text-green-400 rounded-full font-bold">Cache at every layer for maximum performance!</span>
+</div>
+</v-click>
 
 ---
 
 # Caching Strategies
 
+| Strategy | Use Case |
+|----------|----------|
+| `cache: 'force-cache'` | Static data (fastest) |
+| `next: { revalidate: N }` | Update every N seconds |
+| `next: { tags: [...] }` | On-demand invalidation |
+
+---
+
+# Caching Example
+
 ```tsx
-// No caching by default (Next.js 16+)
-const data = await fetch('https://api.example.com/data');
-
-// Revalidate every hour (time-based caching)
-const data = await fetch('https://api.example.com/data', {
-  next: { revalidate: 3600 }
+// Cache product catalog, revalidate hourly
+const products = await fetch('https://api.example.com/products', {
+  next: { revalidate: 3600, tags: ['products'] }
 });
-
-// Force caching (explicit opt-in)
-const data = await fetch('https://api.example.com/static', {
-  cache: 'force-cache'
-});
-
-// Revalidate on-demand with tags
-const data = await fetch('https://api.example.com/products', {
-  next: { tags: ['products'] }
-});
-
-// Revalidate or update cache
-import { revalidateTag, updateTag } from 'next/cache';
-revalidateTag('products');  // Background refresh
-updateTag('products');      // Immediate refresh (Next.js 16+)
 ```
+
+```tsx
+// Invalidate when admin updates products
+import { revalidateTag } from 'next/cache';
+revalidateTag('products');
+```
+
+<v-clicks>
+
+- `revalidate: 3600` - refresh data every hour
+- `tags: ['products']` - invalidate on demand
+
+</v-clicks>
 
 ---
 
@@ -578,51 +538,12 @@ updateTag('products');      // Immediate refresh (Next.js 16+)
 ```tsx
 import { Suspense } from 'react';
 
-async function SlowData() {
-  const data = await fetchSlowData();
-  return <div>{data}</div>;
-}
-
-async function FastData() {
-  const data = await fetchFastData();
-  return <div>{data}</div>;
-}
-
 export default function Page() {
   return (
     <div>
-      {/* Shows immediately */}
-      <Suspense fallback={<div>Loading fast data...</div>}>
-        <FastData />
+      <Suspense fallback={<div>Loading...</div>}>
+        <SlowComponent /> {/* Streams in when ready */}
       </Suspense>
-
-      {/* Streams in when ready */}
-      <Suspense fallback={<div>Loading slow data...</div>}>
-        <SlowData />
-      </Suspense>
-    </div>
-  );
-}
-```
-
-**TTFB is fast, content streams progressively!**
-
----
-
-# React Server Components Benefits
-
-```tsx
-// Server Component
-import { db } from '@/lib/db';
-
-export default async function Posts() {
-  const posts = await db.post.findMany();
-
-  return (
-    <div>
-      {posts.map(post => (
-        <PostCard key={post.id} post={post} />
-      ))}
     </div>
   );
 }
@@ -630,10 +551,34 @@ export default async function Posts() {
 
 <v-clicks>
 
-**Bundle size benefits:**
-- Database libraries NOT sent to client
-- Only HTML sent to browser
-- Smaller JavaScript bundles
-- Faster page loads
+- Page shell renders immediately
+- Slow components stream in when ready
+- User sees content faster (better TTFB)
 
 </v-clicks>
+
+---
+
+# React Server Components Benefits
+
+```tsx
+// Server Component - db library NOT sent to browser!
+import { db } from '@/lib/db';
+
+export default async function Posts() {
+  const posts = await db.post.findMany();
+  return posts.map(post => <PostCard key={post.id} post={post} />);
+}
+```
+
+<v-clicks>
+
+- Database/API libraries stay on server
+- Only HTML sent to browser
+- Smaller bundles, faster loads
+
+</v-clicks>
+
+<v-click>
+<div class="bg-yellow-500/20 px-4 py-2 text-yellow-200 rounded mt-2">⚠️ Can read cookies, but cannot set them (use Server Actions)</div>
+</v-click>
